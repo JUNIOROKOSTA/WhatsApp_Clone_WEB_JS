@@ -1,0 +1,22 @@
+class Format {
+    static getCamelCase(element){
+        let div = document.createElement('div');
+        div.innerHTML = `<divi data-${element}="id"></div>`;
+        return Object.keys(div.firstChild.dataset)[0];
+    }
+
+    static toFormatTime(time){
+        let seconds = parseInt((time / 1000 ) % 60);
+        let minutes = parseInt((time / (1000*60) ) % 60);
+        let hours = parseInt((time / (1000*60*60) ) % 24);
+
+        minutes = minutes.toString().padStart(2,'0')
+        seconds = seconds.toString().padStart(2,'0')
+        if(hours > 0){
+            return `${hours}:${minutes}:${seconds}`
+        } else{
+            return `${minutes}:${seconds}`
+            
+        }
+    };
+};
