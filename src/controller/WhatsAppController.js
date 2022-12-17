@@ -1,14 +1,17 @@
 class WhatsAppController {
     constructor() {
-        this.el = {};
-
         this.elementsPrototype();
         this.loadElements();
         this.initEvents();
     };
-
+    /*
+    loadElements -> Método procura todos os [id] da pagina HTML
+    Envia cada name de #id encontrado para um Método que retorna o nome do id
+    em formato CamelCase.(Format é a classe, e getCamelCase é o método).
+    
+    */
     loadElements() {
-
+        this.el = {};
         document.querySelectorAll('[id]').forEach(element => {
             this.el[Format.getCamelCase(element.id)] = element;
         });
@@ -171,6 +174,8 @@ class WhatsAppController {
             this.el.panelCamera.css({
                 "height": '100%'
             });
+
+            this._camera = new CameraController(this.el.videoCamera);
         });
 
         this.el.btnClosePanelCamera.on('click', e=>{
@@ -273,8 +278,22 @@ class WhatsAppController {
                     imgEmoji.classList.add(name);
                 });
 
-                this.el.inputText.appendChild(imgEmoji);
+                let cursor = window.getSelection();
+
+                if (!cursor.focusNode || !cursor.focusNode.id == 'input-text'){
+                    this.el.inputText.focus();
+                    cursor = window.getSelection();
+                };
                 
+                let range = document.createRange();
+                range = cursor.getRangeAt(0);
+                range.deleteContents();
+
+                let fragment = document.createDocumentFragment();
+                fragment.appendChild(imgEmoji);
+                range.insertNode(fragment);
+                range.setStartAfter(imgEmoji)
+
                 // dispatchEvent -> Força/disparar o Evento...
                 this.el.inputText.dispatchEvent(new Event('keyup'));
 

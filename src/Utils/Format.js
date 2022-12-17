@@ -1,4 +1,10 @@
 class Format {
+
+    /*
+    getCamelCase -> Método que recebe nome da uma classe ou ID HTML/CSS
+    e retornar seu nome em formato CamelCase.
+    Exemplo: "#btn-submit" => "btnSubmit"
+    */
     static getCamelCase(element){
         let div = document.createElement('div');
         div.innerHTML = `<divi data-${element}="id"></div>`;
