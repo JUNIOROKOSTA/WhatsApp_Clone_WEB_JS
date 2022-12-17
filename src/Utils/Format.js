@@ -1,4 +1,4 @@
-class Format {
+export class Format {
 
     /*
     getCamelCase -> Método que recebe nome da uma classe ou ID HTML/CSS

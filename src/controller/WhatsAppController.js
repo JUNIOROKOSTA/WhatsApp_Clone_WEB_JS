@@ -1,4 +1,8 @@
-class WhatsAppController {
+
+import {Format} from './../Utils/Format';
+import {CameraController} from './CameraController';
+import {DocPrevController} from './DocPrevController'
+export class WhatsAppController {
     constructor() {
         this.elementsPrototype();
         this.loadElements();
@@ -175,18 +179,44 @@ class WhatsAppController {
                 "height": '100%'
             });
 
-            this._camera = new CameraController(this.el.videoCamera);
+            this._camera = new CameraController();
         });
 
         this.el.btnClosePanelCamera.on('click', e=>{
             this.el.panelMessagesContainer.show();
 
             this.el.panelCamera.removeClass('open');
+            this._camera.stopMedia();
         });
 
         this.el.btnTakePicture.on('click', e=>{
-            console.log('btn-take-picture')
+            this._picture = this._camera.takePicture();
+
+            this.el.pictureCamera.src = this._picture;
+            this.el.pictureCamera.show();
+            this.el.videoCamera.hide();
+
+            this.el.btnReshootPanelCamera.show();
+            this.el.containerTakePicture.hide();
+            this.el.containerSendPicture.show();
+
         });
+
+        this.el.btnReshootPanelCamera.on('click', e=>{
+            this.el.pictureCamera.hide();
+            this.el.videoCamera.show();
+            this.el.btnReshootPanelCamera.hide();
+            this.el.containerTakePicture.show();
+            this.el.containerSendPicture.hide();
+        });
+
+
+        this.el.btnSendPicture.on('click', e=>{
+            console.log(this.el.pictureCamera.src)
+            this._camera.stopMedia();
+        });
+
+
 
         this.el.btnAttachDocument.on('click', e=>{
             this.el.panelMessagesContainer.hide();
@@ -194,6 +224,67 @@ class WhatsAppController {
             this.el.panelDocumentPreview.css({
                 "height": '100%'
             });
+
+            this.el.inputDocument.click();
+        });
+
+        this.el.inputDocument.on('change', e=>{
+            if(this.el.inputDocument.files.length){
+                let file = this.el.inputDocument.files[0];
+
+                this._docPrevController = new DocPrevController(file);
+                this._docPrevController.getPreviewData().then(data=>{
+                    this.el.imagePanelDocumentPreview.show();
+                    this.el.filePanelDocumentPreview.hide();
+
+                    this.el.imgPanelDocumentPreview.src = data.src;
+                    this.el.infoPanelDocumentPreview.innerHTML = data.info;
+
+                }).catch(error=>{
+                    switch(file.type){
+
+                        case 'audio/mpeg':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+                        
+                        break;
+
+                        case 'application/x-zip-compressed':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+
+                        break;
+
+                        case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-ppt';
+
+                        break;
+
+                        case 'text/csv':
+                        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-xls';
+
+                        break;
+
+                        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                        case 'text/plain':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-doc';
+
+                        break;
+                        
+                        case 'video/quicktime':
+                        case 'video/x-matroska':
+                        case 'video/mp4':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+                        
+                        break;
+
+                        default:
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+                    }
+                    this.el.filenamePanelDocumentPreview.innerHTML = file.name;
+                    this.el.imagePanelDocumentPreview.hide();
+                    this.el.filePanelDocumentPreview.show();
+                });
+            };
         });
 
         this.el.btnClosePanelDocumentPreview.on('click', e=>{
