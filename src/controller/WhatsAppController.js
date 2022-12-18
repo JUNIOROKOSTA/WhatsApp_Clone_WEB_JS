@@ -1,6 +1,7 @@
 
 import {Format} from './../Utils/Format';
 import {CameraController} from './CameraController';
+import {MicrophoneController} from './MicrophoneController';
 import {DocPrevController} from './DocPrevController'
 export class WhatsAppController {
     constructor() {
@@ -222,7 +223,7 @@ export class WhatsAppController {
             this.el.panelMessagesContainer.hide();
             this.el.panelDocumentPreview.addClass('open');
             this.el.panelDocumentPreview.css({
-                "height": '100%'
+                "width": '100%',
             });
 
             this.el.inputDocument.click();
@@ -236,6 +237,13 @@ export class WhatsAppController {
                 this._docPrevController.getPreviewData().then(data=>{
                     this.el.imagePanelDocumentPreview.show();
                     this.el.filePanelDocumentPreview.hide();
+
+                    this.el.imgPanelDocumentPreview.css({
+                        "width": "auto",
+                        "height": "90%"
+                    });
+
+                    
 
                     this.el.imgPanelDocumentPreview.src = data.src;
                     this.el.infoPanelDocumentPreview.innerHTML = data.info;
@@ -310,17 +318,29 @@ export class WhatsAppController {
 
             this.el.recordMicrophone.show();
             this.el.btnSendMicrophone.hide();
-            console.log('btnSendMicrophone')
             this.recordMicrophoneTime();
+
+            this._microphoneController = new MicrophoneController();
+
+            this._microphoneController.on('ready', audio=>{
+                this._microphoneController.startRecord();
+                console.log('Gravando audio')
+                
+            });
 
         });
 
         this.el.btnCancelMicrophone.on('click', e=>{
             this.closedRecordMicrophone();
+            this._microphoneController.stopRecord();
+
         });
 
         this.el.btnFinishMicrophone.on('click', e=>{
             this.closedRecordMicrophone();
+            this._microphoneController.stopRecord();
+
+
         });
 
         this.el.inputText.on('keypress', e=>{

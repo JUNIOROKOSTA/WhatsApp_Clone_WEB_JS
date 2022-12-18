@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/JUNIOROKOSTA/WhatsApp_Clone_WEB_JS#readme",
   "dependencies": {
+    "pdfjs-dist": "^2.0.489",
     "webpack": "^3.1.0",
     "webpack-dev-server": "^2.5.1"
   }
