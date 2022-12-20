@@ -2,13 +2,18 @@
 import {Format} from './../Utils/Format';
 import {CameraController} from './CameraController';
 import {MicrophoneController} from './MicrophoneController';
-import {DocPrevController} from './DocPrevController'
+import {DocPrevController} from './DocPrevController';
+import { FireBase } from '../Utils/googleFirebase';
+
 
 export class WhatsAppController {
     constructor() {
+        this.initAuth();
         this.elementsPrototype();
         this.loadElements();
         this.initEvents();
+        this._firebase = new FireBase();
+
     };
     /*
     loadElements -> Método procura todos os [id] da pagina HTML
@@ -22,7 +27,16 @@ export class WhatsAppController {
             this.el[Format.getCamelCase(element.id)] = element;
         });
 
+
     }; // END ---> loadElements
+
+    initAuth(){
+        this._firebase.initAuth().then(sucess=>{
+            console.log('Auth-sucesso', sucess)
+        }).catch(err=>{
+            console.error('Auth-error', err)
+        });
+    }
 
     elementsPrototype() {
         // Method-> Mostrar ou Esconder Elementos HTML.

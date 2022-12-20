@@ -1,8 +1,8 @@
-import { initializeApp } from "firebase/app";
-import { firestore } from 'firebase/firestore';
-import { storage} from 'firebase/storage';
+import firebase from 'firebase/app'
+//import 'firebase/auth'
+import 'firebase/storage'
 
-export class Firebase{
+export class FireBase{
     constructor(){
         this._config ={
             apiKey: "AIzaSyDFU59YcOcWkDfCNEy2d_zAzFY9U4mYwtQ",
@@ -18,9 +18,24 @@ export class Firebase{
     }
 
     init(){
+        if(!window._initialized){
+            firebase.initializeApp(this._config);
 
-        const app = initializeApp(firebaseConfig);
+            window._initialized = true;
+
+            firebase.firestore().settings({
+                timestampsInSnapshots: true
+            });
+        };
 
     };
 
-}
+    static bd(){
+        return firebase.firestore();
+    };
+
+    static hd(){
+        return firebase.storage();
+    };
+
+};
