@@ -53,12 +53,16 @@ export class MicrophoneController extends ClassEvents{
                     lastModified: Date.now()
                 });
                 console.log(fileWeb)
-                let reader = new FileReader();
-                reader.onload = e =>{
-                    let audio = new Audio(reader.result);
-                    audio.play();
-                };
-                reader.readAsDataURL(fileWeb);
+
+
+                /*Usando FileReader para executar os arquivos de media */
+
+                // let reader = new FileReader();
+                // reader.onload = e =>{
+                //     let audio = new Audio(reader.result);
+                //     audio.play();
+                // };
+                // reader.readAsDataURL(fileWeb);
             });
 
             this._mediaRecord.start();
