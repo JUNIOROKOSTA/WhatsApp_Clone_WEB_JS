@@ -3,6 +3,7 @@ import {Format} from './../Utils/Format';
 import {CameraController} from './CameraController';
 import {MicrophoneController} from './MicrophoneController';
 import {DocPrevController} from './DocPrevController'
+
 export class WhatsAppController {
     constructor() {
         this.elementsPrototype();
@@ -318,7 +319,6 @@ export class WhatsAppController {
 
             this.el.recordMicrophone.show();
             this.el.btnSendMicrophone.hide();
-            this.recordMicrophoneTime();
 
             this._microphoneController = new MicrophoneController();
 
@@ -326,6 +326,10 @@ export class WhatsAppController {
                 this._microphoneController.startRecord();
                 console.log('Gravando audio')
                 
+            });
+
+            this._microphoneController.on('recordtime', timer=>{
+                this.el.recordMicrophoneTimer.innerHTML = Format.toFormatTime(timer);
             });
 
         });
@@ -437,15 +441,6 @@ export class WhatsAppController {
         this.el.btnSendMicrophone.show();
         clearInterval(this._recordMicrophoneInterval)
     };// END ---> closedRecordMicrophone
-
-    recordMicrophoneTime(){
-
-        let start = Date.now();
-        this._recordMicrophoneInterval = setInterval(()=>{
-            this.el.recordMicrophoneTimer.innerHTML = Format.toFormatTime(Date.now()- start);
-        }, 100);
- 
-    };// END ---> recordMicrophoneTimer
 
 
 }; // END ---> Class WhatsAppController
