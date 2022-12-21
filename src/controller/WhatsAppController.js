@@ -3,16 +3,14 @@ import {Format} from './../Utils/Format';
 import {CameraController} from './CameraController';
 import {MicrophoneController} from './MicrophoneController';
 import {DocPrevController} from './DocPrevController';
-import { FireBase } from '../Utils/googleFirebase';
 
 
 export class WhatsAppController {
     constructor() {
-        this.initAuth();
+        // this.initAuth();
         this.elementsPrototype();
         this.loadElements();
         this.initEvents();
-        this._firebase = new FireBase();
 
     };
     /*
@@ -30,13 +28,13 @@ export class WhatsAppController {
 
     }; // END ---> loadElements
 
-    initAuth(){
-        this._firebase.initAuth().then(sucess=>{
-            console.log('Auth-sucesso', sucess)
-        }).catch(err=>{
-            console.error('Auth-error', err)
-        });
-    }
+    // initAuth(){
+    //     this._firebase.initAuth().then(sucess=>{
+    //         console.log('Auth-sucesso', sucess)
+    //     }).catch(err=>{
+    //         console.error('Auth-error', err)
+    //     });
+    // }
 
     elementsPrototype() {
         // Method-> Mostrar ou Esconder Elementos HTML.
