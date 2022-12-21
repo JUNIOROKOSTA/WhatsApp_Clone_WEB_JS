@@ -1,37 +1,28 @@
-import {auth} from '../../node_modules/firebase/auth';
-export class FireBase{
+
+export class Firebase{
     constructor(){
-        this.init();
+        this.initFirebase();
+        
     };
 
-    init(){
-        if(!this._initialized){
-            const config = {
-                apiKey: "AIzaSyDFU59YcOcWkDfCNEy2d_zAzFY9U4mYwtQ",
-                authDomain: "whatsapp-clone-okosta88.firebaseapp.com",
-                projectId: "whatsapp-clone-okosta88",
-                storageBucket: "whatsapp-clone-okosta88.appspot.com",
-                messagingSenderId: "27959259023",
-                appId: "1:27959259023:web:16cf0d4349cf089cd965fa"
-              };
-            this.app = initializeApp(config);
-            this._initialized = true;
-        };
-
-    };
-
-    initAuth(){
-        return new Promise((sucess, failed)=>{
-            this.app.auth().si
-        })
+    initFirebase(){
+        const firebaseConfig ={
+            apiKey: "AIzaSyAlqgkrtC0PAzVhaUv1c-rYtAwDyBhRbjE",
+            authDomain: "clone-zap-9165b.firebaseapp.com",
+            projectId: "clone-zap-9165b",
+            storageBucket: "clone-zap-9165b.appspot.com",
+            messagingSenderId: "442901650238",
+            appId: "1:442901650238:web:254951627d3255c751ea6f"
+          };
+        firebase.initializeApp(firebaseConfig)
     }
+    getdb(){
+        const db = firebase.firestore();
 
-    static bd(){
-        return this.app.firestore();
-    };
-
-    static hd(){
-        return this.app.storage();
-    };
-
+        db.collection("users").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
+            });
+        });
+};
 };

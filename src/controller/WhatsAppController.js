@@ -3,16 +3,22 @@ import {Format} from './../Utils/Format';
 import {CameraController} from './CameraController';
 import {MicrophoneController} from './MicrophoneController';
 import {DocPrevController} from './DocPrevController';
-
+import { Firebase } from './../Utils/Firebase';
+import { User } from '../model/User';
 
 export class WhatsAppController {
     constructor() {
-        // this.initAuth();
+        this._firebase = new Firebase();
+
         this.elementsPrototype();
         this.loadElements();
         this.initEvents();
 
+        this.initAuth();
+
     };
+
+
     /*
     loadElements -> Método procura todos os [id] da pagina HTML
     Envia cada name de #id encontrado para um Método que retorna o nome do id
@@ -28,13 +34,42 @@ export class WhatsAppController {
 
     }; // END ---> loadElements
 
-    // initAuth(){
-    //     this._firebase.initAuth().then(sucess=>{
-    //         console.log('Auth-sucesso', sucess)
-    //     }).catch(err=>{
-    //         console.error('Auth-error', err)
-    //     });
-    // }
+    initAuth(){
+        this._firebase.initAuth().then(usertoken=>{
+            this._user = new User(usertoken.user.email);
+
+            this._user.on('datachange', data =>{
+                document.querySelector('title').innerHTML = data.name + ' - WhatsApp JS'
+                this.el.inputNamePanelEditProfile.innerHTML = data.name;
+                if(data.photo){
+                    this.el.imgDefaultPanelEditProfile.hide();
+                    let photo = this.el.imgPanelEditProfile;
+                    photo.src = data.photo;
+                    photo.show();
+
+                    let myPhoto = this.el.myPhoto.querySelector('img')
+                    myPhoto.src = data.photo;
+                    myPhoto.show();
+                };
+                
+            });
+
+            this._user.name = usertoken.user.displayName;
+            this._user.email = usertoken.user.email;
+            this._user.photo = usertoken.user.photoURL;
+
+            this._user.save().then(()=>{
+                this.el.appContent.css({
+                    'display':'flex'
+                });
+            });
+
+            
+            
+        }).catch(err=>{
+            console.error('Auth-error', err)
+        });
+    }
 
     elementsPrototype() {
         // Method-> Mostrar ou Esconder Elementos HTML.
@@ -250,12 +285,6 @@ export class WhatsAppController {
                 this._docPrevController.getPreviewData().then(data=>{
                     this.el.imagePanelDocumentPreview.show();
                     this.el.filePanelDocumentPreview.hide();
-
-                    this.el.imgPanelDocumentPreview.css({
-                        "width": "auto",
-                        "height": "90%"
-                    });
-
                     
 
                     this.el.imgPanelDocumentPreview.src = data.src;
