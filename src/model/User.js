@@ -37,4 +37,36 @@ import { Model } from "./Model";
     static findEmail(email){
         return User.getRef().doc(email);
     }
+
+    convertBase64(str){
+        return btoa(str);
+    }
+
+    static getRefContacts(id){
+        return User.getRef().doc(id).collection('contacts')
+
+    }
+
+    addContact(contact){
+        return User.getRefContacts(this.email)
+        .doc(this.convertBase64(contact.email)).set(contact.toJSON())
+    }
+
+    getContacts(){
+        return new Promise((sucess, failed)=>{
+            User.getRefContacts(this.email).onSnapshot(docs =>{
+                let contacts = [];
+                docs.forEach(doc => {
+                    let data = doc.data();
+                    data.id = doc.id;
+
+                    contacts.push(data);
+                });
+                this.trigger('contactschange', docs)
+                sucess(contacts);
+            });
+        }).catch(err=>{
+            failed(err)
+        });
+    }
  }
