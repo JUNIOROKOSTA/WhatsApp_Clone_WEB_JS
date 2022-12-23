@@ -17,6 +17,9 @@ import { Model } from "./Model";
     get photo(){return this._data.photo};
     set photo(value){this._data.photo = value};
 
+    get chatId(){return this._data.chatId};
+    set chatId(value){this._data.chatId = value};
+
     getById(id){
         return new Promise((sucess, failed)=>{
             User.findEmail(id).onSnapshot(doc=>{
@@ -50,11 +53,11 @@ import { Model } from "./Model";
     addContact(contact){
         return User.getRefContacts(this.email)
         .doc(this.convertBase64(contact.email)).set(contact.toJSON())
-    }
+    };
 
-    getContacts(){
+    getContacts(filter = ''){
         return new Promise((sucess, failed)=>{
-            User.getRefContacts(this.email).onSnapshot(docs =>{
+            User.getRefContacts(this.email).where('name', '>=', filter).onSnapshot(docs =>{
                 let contacts = [];
                 docs.forEach(doc => {
                     let data = doc.data();

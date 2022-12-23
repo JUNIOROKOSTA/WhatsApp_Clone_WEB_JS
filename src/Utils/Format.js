@@ -25,4 +25,17 @@ export class Format {
             
         }
     };
+
+    static dateToTime(date, locale = 'pt-BR'){
+        let todate = date.toDate()
+        return todate.toLocaleTimeString(locale,{
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    }
+
+    static timeStampToTime(ts){
+        return (ts && typeof ts.toDate === 'function') ? 
+        Format.dateToTime(ts) : '';
+    }
 };
