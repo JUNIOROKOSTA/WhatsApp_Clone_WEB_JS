@@ -7,6 +7,7 @@ import { Firebase } from './../Utils/Firebase';
 import { User } from '../model/User';
 import { Chat } from '../model/Chats';
 import { Message } from '../model/Message';
+import { Base64 } from '../Utils/Base64';
 
 export class WhatsAppController {
     constructor() {
@@ -115,9 +116,7 @@ export class WhatsAppController {
 
                 let me = (data.from === this._user.email)
 
-                if(!containerMSG.querySelector('#_'+data.id)){
-
-                    
+                if(!this.el.panelMessagesContainer.querySelector('#_'+data.id)){
 
                     if(!me){
                         doc.ref.set({status:'read'},{merge:true});
@@ -125,8 +124,14 @@ export class WhatsAppController {
 
                     let view = msg.getViewElement(me)
                     containerMSG.appendChild(view)
-                } else if(me){
-                    let msgEl = containerMSG.querySelector('#_'+data.id);
+                } else {
+                    let view = msg.getViewElement(me);
+                    this.el.panelMessagesContainer.querySelector('#_'+data.id).innerHTML = view.innerHTML;
+                } 
+                
+                
+                if(this.el.panelMessagesContainer.querySelector('#_'+data.id) && me){
+                    let msgEl = this.el.panelMessagesContainer.querySelector('#_'+data.id);
                     msgEl.querySelector('.message-status').innerHTML = msg.getStatusElementView().outerHTML;
                 }
             })
@@ -406,7 +411,8 @@ export class WhatsAppController {
         this.el.inputPhoto.on('change', e=>{
             console.log('Foto', this.el.inputPhoto.files);
             [...this.el.inputPhoto.files].forEach(file =>{
-                console.log(file)
+                Message.sendImage(this._contactActive.chatId, this._user.email, file);
+
             });
 
         });
@@ -451,8 +457,55 @@ export class WhatsAppController {
 
 
         this.el.btnSendPicture.on('click', e=>{
-            console.log(this.el.pictureCamera.src)
+            //console.log(this.el.pictureCamera.src)
             this._camera.stopMedia();
+
+            this.el.btnSendPicture.disabled = true;
+            let regex = /^data:(.+);base64,(.*)$/;
+            let result = (this.el.pictureCamera.src).match(regex);
+            let mimeType = result[1];
+            let ext = mimeType.split('/')[1];
+            let fileName = `camera${Date.now()}.${ext}`;
+
+            let picture = new Image();
+            picture.src = this.el.pictureCamera.src;
+
+            picture.onload = event=>{
+                let canvas = document.createElement('canvas');
+                let context = canvas.getContext('2d');
+
+                canvas.width = picture.width;
+                canvas.height = picture.height;
+
+                context.translate(picture.width, 0);
+                context.scale(-1, 1);
+
+                context.drawImage(picture, 0,0, canvas.width, canvas.height);
+
+                fetch(canvas.toDataURL(mimeType)).then(
+                    res=>{ return res.arrayBuffer();}
+                ).then(
+                    buffer=>{return new File([buffer], fileName, { type: mimeType});}
+                ).then(
+                    file =>{ Message.sendImage(this._contactActive.chatId, this._user.email, file);
+                        this.el.btnSendPicture.disabled = false;
+                    }
+                
+                    );
+
+            };
+
+            this.el.panelCamera.removeClass('open');
+            this.el.btnReshootPanelCamera.hide();
+            this.el.pictureCamera.hide()
+            this.el.videoCamera.show();
+            this.el.containerSendPicture.hide();
+            this.el.containerTakePicture.show()
+            this.el.panelMessagesContainer.show();
+
+
+
+            //console.log(result)
         });
 
 
@@ -548,7 +601,27 @@ export class WhatsAppController {
         });
 
         this.el.btnSendDocument.on('click', e=>{
-            console.log('btn-send-document')
+            //console.log('btn-send-document')
+
+            let file = this.el.inputDocument.files[0];
+            let base64El = this.el.imgPanelDocumentPreview.src;
+
+            if(file.type === 'application/pdf'){
+
+                Base64.toFile(base64El).then(filePreview=>{
+                    Message.sendDocument(this._contactActive.chatId, 
+                        this._user.email, file, filePreview, 
+                        this.el.infoPanelDocumentPreview.innerHTML);
+                });
+                
+            } else{
+                Message.sendDocument(this._contactActive.chatId, 
+                    file, this._user.email);
+
+            };
+
+            this.el.btnClosePanelDocumentPreview.click();
+            
         });
 
         
