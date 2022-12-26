@@ -48,12 +48,24 @@ export class MicrophoneController extends ClassEvents{
                 });
 
                 let fileName = `record_timeStamp${Date.now()}.webm`;
-                let fileWeb = new File([blob],fileName, {
-                    type: this.mimeType,
-                    lastModified: Date.now()
-                });
-                console.log(fileWeb)
 
+                let audioContext = new AudioContext();
+
+                let reader = new FileReader();
+
+                reader.onload = e =>{
+
+                    audioContext.decodeAudioData(reader.result).then(decode=>{
+                        let fileWeb = new File([blob],fileName, {
+                            type: this.mimeType,
+                            lastModified: Date.now()
+                        });
+
+                        this.trigger('recorded', fileWeb, decode);
+                    });
+                };
+
+                reader.readAsArrayBuffer(blob)
 
                 /*Usando FileReader para executar os arquivos de media */
 
@@ -77,19 +89,22 @@ export class MicrophoneController extends ClassEvents{
             this._mediaRecord.stop();
             this.stopMedia();
             this.startTime();
+            this.stopTimer();
+
+            console.log('stopRecord!!')
         };
     };
 
     startTime(){
 
         let start = Date.now();
-        this._recordMicrophoneInterval = setInterval(()=>{
+        this.recordMicrophoneInterval = setInterval(()=>{
             this.trigger('recordtime',(Date.now()- start));
         }, 100);
  
     };// END ---> recordMicrophoneTimer
 
     stopTimer(){
-        clearInterval(this._recordMicrophoneInterval);
+        clearInterval(this.recordMicrophoneInterval);
     };
 };
